@@ -10,7 +10,7 @@ This project demonstrates a bot designed to generate and qualify warm leads auto
 
 ### Deliverables:
 
-*   **Loom Video Demonstration:** **[https://github.com/fatma2123456/Practical-Skills-Assessment-SOFINDEX/blob/main/Mandatory%20Project/mandatory%20project%20video.mp4]**
+*   **Video Demonstration:** **[https://github.com/fatma2123456/Practical-Skills-Assessment-SOFINDEX/blob/main/Mandatory%20Project/mandatory%20project%20video.mp4]**
 *   **Blueprint/Code:** The workflow can be found in the `1_Warm_Lead_Generation_Bot` folder.
 
 ### Tools Used:
@@ -27,7 +27,7 @@ I have chosen the **Telegram Voice-to-Task Workflow** as my optional project. Th
 
 ### Deliverables:
 
-*   **Loom Video Demonstration:** **[https://github.com/fatma2123456/Practical-Skills-Assessment-SOFINDEX/blob/main/Telegram%20Voice-to-Task%20Project/Telegram%20Voice-to-Task.mp4]**
+*   **Video Demonstration:** **[https://github.com/fatma2123456/Practical-Skills-Assessment-SOFINDEX/blob/main/Telegram%20Voice-to-Task%20Project/Telegram%20Voice-to-Task.mp4]**
 *   **n8n Blueprint (JSON):** The exported JSON for the n8n scenario is located in the `2_Telegram_Voice-to-Task` folder.
 
 ### Workflow Steps:
