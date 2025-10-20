@@ -1,0 +1,227 @@
+{
+  "name": "Telegram Voice-to-Task",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "ff24c735-e1b4-4e63-91e8-506530ce583a",
+      "name": "Telegram Trigger",
+      "webhookId": "02cbc2e6-9627-44d2-8610-3285c351df5e",
+      "credentials": {
+        "telegramApi": {
+          "id": "VJSkSxyXA5RBCgS8",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.message.voice.file_id }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "d4bbe79f-23ef-4f8d-bf2f-bf1d89e8d426",
+      "name": "Get a file",
+      "webhookId": "67c7b58b-3dfe-4df2-8403-1756665913f6",
+      "credentials": {
+        "telegramApi": {
+          "id": "VJSkSxyXA5RBCgS8",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "inputType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        416,
+        0
+      ],
+      "id": "9dc4271e-0ab7-45fa-959c-87e7faa59b06",
+      "name": "Transcribe a recording",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "Ssru5cweZ98sqjci",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=From the following text, please extract the to-do items as a JSON array of strings. If there are no tasks, return an empty array.\nText: {{ $json.content.parts[0].text }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [
+        624,
+        0
+      ],
+      "id": "149badd2-db9d-4d45-b5b8-cdec65bba8fb",
+      "name": "Message a model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "6jV3V4c8DtK51dzd",
+          "name": "Google Gemini(PaLM) Api account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const rawText = $json.content.parts[0].text;\n\n// Clean the text from markdown formatting\nconst cleanedText = rawText.replace(/```json\\n|```|\\\\n/g, '').trim();\n\n// Parse the cleaned string into an array\nconst tasks = JSON.parse(cleanedText);\n\n// Return the data in a format n8n can loop over\nreturn tasks.map(taskName => ({\n  json: {\n    task: taskName\n  }\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        976,
+        0
+      ],
+      "id": "9e63834d-6527-4ede-849f-cfb3667f4e6b",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "databaseId": {
+          "__rl": true,
+          "value": "29186f03-302c-80e4-95ca-de1f4049f637",
+          "mode": "list",
+          "cachedResultName": "N8N Tasks",
+          "cachedResultUrl": "https://www.notion.so/29186f03302c80e495cade1f4049f637"
+        },
+        "title": "={{ $json.task }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        1184,
+        0
+      ],
+      "id": "87b9b21f-aafd-4ae1-858d-5179a71dc204",
+      "name": "Create a database page1",
+      "credentials": {
+        "notionApi": {
+          "id": "zudm8BxL1vwQwnkX",
+          "name": "Notion account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get a file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a file": {
+      "main": [
+        [
+          {
+            "node": "Transcribe a recording",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribe a recording": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Create a database page1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a database page1": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": -1,
+    "availableInMCP": false
+  },
+  "versionId": "1dd85d52-24e0-4351-a207-69dce195f0f1",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "5ad667ecaf2bf2d1232da6ec9990af23857ae317ffdcc5a8570aa5a08c5bff2a"
+  },
+  "id": "F3Gm5lgvPuT2MZok",
+  "tags": []
+}
